@@ -5,6 +5,8 @@ from django.utils import timezone
 from apps.projects.models import Project
 from apps.tasks.models import Task, Tag
 from apps.tasks.choices.priority import Priority
+from apps.projects.serializers.project_serializers import ProjectShortInfoSerializer
+from apps.tasks.serializers.tag_serializers import TagSerializer
 
 
 class AllTasksSerializer(serializers.ModelSerializer):
@@ -30,7 +32,7 @@ class AllTasksSerializer(serializers.ModelSerializer):
         )
 
 
-class CreateTaskSerializer(serializers.ModelSerializer):
+class CreateUpdateTaskSerializer(serializers.ModelSerializer):
     project = serializers.SlugRelatedField(
         slug_field='name',
         queryset=Project.objects.all(),
@@ -96,8 +98,6 @@ class CreateTaskSerializer(serializers.ModelSerializer):
 
         return value
 
-
-
     def create(self, validated_data: dict[str, Any]) -> Task:
         tags = validated_data.pop('tags', [])
 
@@ -110,5 +110,26 @@ class CreateTaskSerializer(serializers.ModelSerializer):
 
         return task
 
+    def update(self, instance: Task, validated_data: dict[str, Any]) -> Task:
+        tags = validated_data.pop('tags', [])
 
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if tags:
+            for tag in tags:
+                instance.tags.add(tag)
+
+        instance.save()
+
+        return instance
+
+
+class TaskDetailSerializer(serializers.ModelSerializer):
+    project = ProjectShortInfoSerializer()
+    tags = TagSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Task
+        exclude = ('updated_at', 'deleted_at')
 
