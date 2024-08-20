@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from apps.projects.models import ProjectFile
+from apps.projects.serializers.project_serializers import ProjectShortInfoSerializer
 from apps.projects.utils.upload_file_helpers import (
     check_extension,
     create_file_path,
@@ -33,7 +34,7 @@ class CreateProjectFileSerializer(serializers.ModelSerializer):
         return value
 
     def validate_file_path(self, value: str) -> str:
-        if not check_extension(value):
+        if not check_extension(value.name):
             raise serializers.ValidationError(
                 "Valid file extensions: ['.csv', '.doc', '.pdf', '.xlsx', '.py']"
             )
@@ -59,4 +60,10 @@ class CreateProjectFileSerializer(serializers.ModelSerializer):
                 "File size is too large (2 MB as maximum)."
             )
 
-        
+
+class ProjectFileDetailSerializer(serializers.ModelSerializer):
+    project = ProjectShortInfoSerializer(many=True)
+
+    class Meta:
+        model = ProjectFile
+        exclude = ('file_path',)
