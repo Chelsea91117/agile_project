@@ -1,16 +1,18 @@
 from django.db.models import QuerySet
+from django.shortcuts import get_object_or_404
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from apps.tasks.models import Task
-from django.shortcuts import get_object_or_404
-from apps.tasks.serializers.task_serializers import (
-    AllTasksSerializer,
-    CreateUpdateTaskSerializer,
-    TaskDetailSerializer,
-)
+from apps.tasks.serializers.task_serializers import *
+
+
+class TaskViewListCreateGenericView(ListCreateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = CreateUpdateTaskSerializer
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -59,7 +61,7 @@ class TasksListAPIView(APIView):
         )
 
     def post(self, request: Request, *args, **kwargs) -> Response:
-        serializer = CreateTaskSerializer(data=request.data)
+        serializer = CreateUpdateTaskSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
