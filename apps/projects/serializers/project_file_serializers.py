@@ -10,16 +10,16 @@ from apps.projects.utils.upload_file_helpers import (
 
 
 class AllProjectFilesSerializer(serializers.ModelSerializer):
-
+    project = serializers.SlugRelatedField(read_only=True, slug_field='name', many=True)
     class Meta:
         model = ProjectFile
-        fields = ('id', 'file_name', 'project')
+        fields = ['id', 'file_name', 'project']
 
 
 class CreateProjectFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectFile
-        fields = ('file_name', 'file_path')
+        fields = ['file_name', 'file_path']
 
     def validate_file_name(self, value: str) -> str:
         if not value.isascii():
@@ -66,4 +66,4 @@ class ProjectFileDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProjectFile
-        exclude = ('file_path',)
+        exclude = ['file_path']

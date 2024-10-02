@@ -5,7 +5,7 @@ from apps.projects.models import Project
 class AllProjectsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'name', 'created_at')
+        fields = ['id', 'name', 'created_at']
 
 
 class CreateProjectSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class CreateProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('name', 'description', 'created_at')
+        fields = ['name', 'description', 'created_at']
 
     def validate_description(self, value: str) -> str:
         if len(value) < 30:
@@ -28,10 +28,10 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('id', 'name', 'description', 'count_of_files')
+        fields = ['id', 'name', 'description', 'count_of_files']
 
 
 class ProjectShortInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'name')
+        fields = ['id', 'name']
